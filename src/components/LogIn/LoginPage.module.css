@@ -1,0 +1,56 @@
+.Title {
+  font-size: 50px;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.InputContainer {
+  flex-wrap: wrap;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ForSubmit {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.Submit {
+  margin-top: 10px;
+  border-radius: 5px;
+  width: 50%;
+  font-size: 20px;
+  padding: 5px;
+  background-color: rgb(127, 204, 54);
+}
+
+.HaventAnAPage {
+  width: 100%;
+  text-align: end;
+  color: rgb(29, 127, 184);
+  padding: 10px 0 0 0;
+}
+
+.HaventAnAPage:hover {
+  color: rgb(9, 79, 119);
+}
+
+.ShowPassword {
+  background: url("../../resources/icons/showPassword.png") no-repeat 0 0;
+  background-size: contain;
+  height: 30px;
+  width: 30px;
+}
+
+.HidePassword {
+  background: url("../../resources/icons/hidePassword.png") no-repeat 0 0;
+  background-size: contain;
+  height: 30px;
+  width: 30px;
+}
+
+.ValidatingError {
+  background: red;
+}
