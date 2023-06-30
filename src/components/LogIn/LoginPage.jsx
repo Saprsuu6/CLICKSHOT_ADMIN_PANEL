@@ -1,54 +1,55 @@
 import React, { useState } from "react";
-import classes from "./LoginPage.module.css";
+import classes from "../AuthorizationStyles.module.css";
 import Input from "../../UI/Input/Input";
 import ValidationError from "../../UI/Error/Error";
-import Validators from "../../utils/Regex";
+import Validators from "../../utils/Validators";
 import { useNavigate } from "react-router-dom";
 import Authorization from "../../APIs/Authorization";
 import Errors from "../../utils/Errors";
+import classNames from "classnames";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
+
   const [validationError, setValidationError] = useState("");
   const [passwordShown, setPasswordShown] = useState(false);
   const [serverError, setSertverError] = useState("");
 
   const handleLoginChange = (event) => {
     setLogin(event.target.value);
+    validate(event.target.value, Validators.validateLogin);
   };
 
   const handlePasswordChange = (event) => {
     setPassword(event.target.value);
-    validatePassword(event.target.value);
+    validate(event.target.value, Validators.validatePassword);
+  };
+
+  const validate = (fireld, validator) => {
+    setValidationError(validator(fireld));
+    if (validationError.trim() !== "") return false;
+    else return true;
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (validatePassword(password) && login.length > 0) {
+    if (
+      validate(password, Validators.validatePassword) &&
+      validate(login, Validators.validateLogin)
+    ) {
       let response = Authorization.singIn(login, password);
       console.log(response);
 
-      if (response.contains("0")) navigate(`/mainPage`);
+      // fix that
+      if (response.includes("0")) navigate(`/mainPage`);
       else {
         console.log("Imitation of server error");
         setSertverError(Errors.authorization(response));
       }
     }
-  };
-
-  const validatePassword = (password) => {
-    console.log(password);
-    if (Validators.validatePasswor(password) == null) {
-      setValidationError(
-        "Password not valid. Password have to contains: One big latter, 0-9, @$!%*?&"
-      );
-      return false;
-    }
-
-    setValidationError("");
-    return true;
   };
 
   return (
@@ -84,7 +85,17 @@ const LoginPage = () => {
         {validationError && (
           <ValidationError>{validationError}</ValidationError>
         )}
-        {serverError !== "" && <ValidationError>{serverError}</ValidationError>}
+        {serverError.trim() !== "" && (
+          <ValidationError>{serverError}</ValidationError>
+        )}
+        <p
+          className={classNames(classes.FogotPassword, classes.AuthLink)}
+          onClick={() => {
+            navigate("/forgotPassword");
+          }}
+        >
+          Forgot password
+        </p>
         <div className={classes.ForSubmit}>
           <button type="submit" className={classes.Submit}>
             Log in
@@ -92,7 +103,7 @@ const LoginPage = () => {
         </div>
       </form>
       <p
-        className={classes.HaventAnAPage}
+        className={classNames(classes.BottomLink, classes.AuthLink)}
         onClick={() => {
           navigate("/singIn");
         }}

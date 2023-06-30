@@ -26,26 +26,34 @@
   background-color: rgb(127, 204, 54);
 }
 
-.HaventAnAPage {
-  width: 100%;
+.BottomLink {
+  height: 100%;
+  text-align: center;
+}
+
+.FogotPassword {
   text-align: end;
+}
+
+.AuthLink {
+  cursor: pointer;
   color: rgb(29, 127, 184);
   padding: 10px 0 0 0;
 }
 
-.HaventAnAPage:hover {
+.AuthLink:hover {
   color: rgb(9, 79, 119);
 }
 
 .ShowPassword {
-  background: url("../../resources/icons/showPassword.png") no-repeat 0 0;
+  background: url("../resources/icons/showPassword.png") no-repeat 0 0;
   background-size: contain;
   height: 30px;
   width: 30px;
 }
 
 .HidePassword {
-  background: url("../../resources/icons/hidePassword.png") no-repeat 0 0;
+  background: url("../resources/icons/hidePassword.png") no-repeat 0 0;
   background-size: contain;
   height: 30px;
   width: 30px;
