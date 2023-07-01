@@ -1,117 +1,172 @@
-import React, { useState } from "react";
+import React, { Component } from "react";
 import classes from "../AuthorizationStyles.module.css";
 import Input from "../../UI/Input/Input";
-import ValidationError from "../../UI/Error/Error";
+import Error from "../../UI/Error/Error";
 import Validators from "../../utils/Validators";
 import { useNavigate } from "react-router-dom";
 import Authorization from "../../APIs/Authorization";
 import Errors from "../../utils/Errors";
 import classNames from "classnames";
+import { localStorageKeys } from "../../utils/LocalStorageKeys";
 
-const LoginPage = () => {
-  const navigate = useNavigate();
+class LoginPage extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      login: "",
+      rememberMe: false,
+      password: "",
+      validationError: "",
+      passwordShown: false,
+      serverError: "",
+    };
 
-  const [login, setLogin] = useState("");
-  const [password, setPassword] = useState("");
+    if (localStorage.getItem(localStorageKeys.REMEMBER_ME) != null) {
+      this.logIn();
+    }
+  }
 
-  const [validationError, setValidationError] = useState("");
-  const [passwordShown, setPasswordShown] = useState(false);
-  const [serverError, setSertverError] = useState("");
-
-  const handleLoginChange = (event) => {
-    setLogin(event.target.value);
-    validate(event.target.value, Validators.validateLogin);
+  //#region handlers
+  handleLoginChange = (event) => {
+    this.setState({
+      login: event.target.value,
+    });
+    this.validate(event.target.value, Validators.validateLogin);
   };
 
-  const handlePasswordChange = (event) => {
-    setPassword(event.target.value);
-    validate(event.target.value, Validators.validatePassword);
+  handlePasswordChange = (event) => {
+    this.setState({
+      password: event.target.value,
+    });
+    this.validate(event.target.value, Validators.validatePassword);
   };
 
-  const validate = (fireld, validator) => {
-    setValidationError(validator(fireld));
-    if (validationError.trim() !== "") return false;
-    else return true;
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    if (
-      validate(password, Validators.validatePassword) &&
-      validate(login, Validators.validateLogin)
-    ) {
-      let response = Authorization.singIn(login, password);
-      console.log(response);
-
-      // fix that
-      if (response.includes("0")) navigate(`/mainPage`);
-      else {
-        console.log("Imitation of server error");
-        setSertverError(Errors.authorization(response));
-      }
+  handleRememberMe = (event) => {
+    this.setState({
+      rememberMe: event.target.value,
+    });
+    // save uathorisate user state
+    if (this.state.login.length > 0 && this.state.password.length > 0) {
+      console.log(this.state.rememberMe);
+      localStorage.setItem(localStorageKeys.REMEMBER_ME, event.target.value);
+      localStorage.setItem(localStorageKeys.USER_LOGIN, this.state.login);
+      localStorage.setItem(localStorageKeys.USER_PASSWORD, this.state.password);
     }
   };
 
-  return (
-    <div>
-      <h1 className={classes.Title}>Login Page</h1>
-      <form onSubmit={handleSubmit}>
-        <div className={classes.InputContainer}>
-          <Input
-            type="text"
-            label={"Login:"}
-            value={login}
-            placeholder="Field for login"
-            onChange={handleLoginChange}
-            required
-          />
-        </div>
-        <div className={classes.InputContainer}>
-          <Input
-            type={passwordShown ? "text" : "password"}
-            label={"Password:"}
-            placeholder="Field for Password"
-            value={password}
-            onChange={handlePasswordChange}
-            required
-          />
-          <div
-            onClick={() => setPasswordShown(!passwordShown)}
-            className={
-              !passwordShown ? classes.ShowPassword : classes.HidePassword
-            }
-          ></div>
-        </div>
-        {validationError && (
-          <ValidationError>{validationError}</ValidationError>
-        )}
-        {serverError.trim() !== "" && (
-          <ValidationError>{serverError}</ValidationError>
-        )}
+  handleSubmit = (event) => {
+    event.preventDefault();
+    if (
+      this.validate(this.state.password, Validators.validatePassword) &&
+      this.validate(this.state.login, Validators.validateLogin)
+    ) {
+      // save uathorisate user state
+      localStorage.setItem(localStorageKeys.USER_LOGIN, this.state.login);
+      localStorage.setItem(localStorageKeys.USER_PASSWORD, this.state.password);
+
+      //logIn();
+    }
+  };
+  //#endregion
+
+  logIn() {
+    let response = Authorization.singIn(this.state.login, this.state.password);
+    console.log(response);
+    if (response.includes("0")) this.props.navigate(`/mainPage`);
+    else {
+      this.setState({
+        serverError: Errors.authorization(response),
+      });
+    }
+  }
+
+  validate = (fireld, validator) => {
+    this.setState({
+      validationError: validator(fireld),
+    });
+
+    if (this.state.validationError.trim() !== "") return false;
+    else return true;
+  };
+
+  render() {
+    return (
+      <div>
+        <h1 className={classes.Title}>Login Page</h1>
+        <form onSubmit={this.handleSubmit}>
+          <div className={classes.InputContainer}>
+            <Input
+              type="text"
+              label={"Login:"}
+              value={this.state.login}
+              placeholder="Field for login"
+              onChange={this.handleLoginChange}
+              required
+            />
+          </div>
+          <div className={classes.InputContainer}>
+            <Input
+              type={this.state.passwordShown ? "text" : "password"}
+              label={"Password:"}
+              placeholder="Field for Password"
+              value={this.state.password}
+              onChange={this.handlePasswordChange}
+              required
+            />
+            <div
+              onClick={() => this.setPasswordShown(!this.state.passwordShown)}
+              className={
+                !this.state.passwordShown
+                  ? classes.ShowPassword
+                  : classes.HidePassword
+              }
+            ></div>
+          </div>
+          <div className={classes.InputContainer}>
+            <Input
+              inputClassName={classes.CheckBox}
+              type={"checkbox"}
+              value={this.state.rememberMe}
+              label={"Remember me"}
+              onChange={this.state.handleRememberMe}
+            />
+          </div>
+          {this.state.validationError && (
+            <Error>{this.state.validationError}</Error>
+          )}
+          {this.state.serverError.trim() !== "" && (
+            <Error>{this.state.serverError}</Error>
+          )}
+          <p
+            className={classNames(classes.FogotPassword, classes.AuthLink)}
+            onClick={() => {
+              this.props.navigate("/forgotPassword");
+            }}
+          >
+            Forgot password
+          </p>
+          <div className={classes.ForSubmit}>
+            <button type="submit" className={classes.Submit}>
+              Log in
+            </button>
+          </div>
+        </form>
         <p
-          className={classNames(classes.FogotPassword, classes.AuthLink)}
+          className={classNames(classes.BottomLink, classes.AuthLink)}
           onClick={() => {
-            navigate("/forgotPassword");
+            this.props.navigate("/singIn");
           }}
         >
-          Forgot password
+          Haven't an a page
         </p>
-        <div className={classes.ForSubmit}>
-          <button type="submit" className={classes.Submit}>
-            Log in
-          </button>
-        </div>
-      </form>
-      <p
-        className={classNames(classes.BottomLink, classes.AuthLink)}
-        onClick={() => {
-          navigate("/singIn");
-        }}
-      >
-        Haven't an a page
-      </p>
-    </div>
-  );
+      </div>
+    );
+  }
+}
+
+const Point = () => {
+  const navigate = useNavigate();
+  return <LoginPage navigate={navigate} />;
 };
 
-export default LoginPage;
+export default Point;

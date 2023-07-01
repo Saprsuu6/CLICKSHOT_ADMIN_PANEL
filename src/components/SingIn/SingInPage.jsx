@@ -3,8 +3,11 @@ import { useNavigate } from "react-router-dom";
 import Validators from "../../utils/Validators";
 import classes from "../AuthorizationStyles.module.css";
 import Input from "../../UI/Input/Input";
-import ValidationError from "../../UI/Error/Error";
+import Error from "../../UI/Error/Error";
 import classNames from "classnames";
+import { localStorageKeys } from "../../utils/LocalStorageKeys";
+import Authorization from "../../APIs/Authorization";
+import Errors from "../../utils/Errors";
 
 export const SingInPage = () => {
   const navigate = useNavigate();
@@ -17,6 +20,7 @@ export const SingInPage = () => {
   const [passwordShown, setPasswordShown] = useState(false);
   const [serverError, setSertverError] = useState("");
 
+  //#region handlers
   const handleLoginChange = (event) => {
     setLogin(event.target.value);
     validate(event.target.value, Validators.validateLogin);
@@ -45,9 +49,23 @@ export const SingInPage = () => {
       validate(password, Validators.validatePassword) &&
       validate(login, Validators.validateLogin)
     ) {
-      // TODO smth
+      // save uathorisate user state
+      localStorage.setItem(localStorageKeys.USER_LOGIN, login);
+      localStorage.setItem(localStorageKeys.USER_PASSWORD, password);
+      localStorage.setItem(localStorageKeys.USER_EMAIL, email);
+
+      singIn();
     }
   };
+  //#endregion
+
+  function singIn() {
+    //let response = Authorization.logIn(login, password, email);
+    //console.log(response);
+    // fix that
+    //if (response.includes("0")) navigate(`/mainPage`);
+    //else setSertverError(Errors.authorization(response));
+  }
 
   return (
     <div>
@@ -89,12 +107,8 @@ export const SingInPage = () => {
             }
           ></div>
         </div>
-        {validationError && (
-          <ValidationError>{validationError}</ValidationError>
-        )}
-        {serverError.trim() !== "" && (
-          <ValidationError>{serverError}</ValidationError>
-        )}
+        {validationError && <Error>{validationError}</Error>}
+        {serverError.trim() !== "" && <Error>{serverError}</Error>}
         <div className={classes.ForSubmit}>
           <button type="submit" className={classes.Submit}>
             Sing in

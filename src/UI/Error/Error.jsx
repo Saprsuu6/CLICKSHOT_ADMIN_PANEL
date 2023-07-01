@@ -1,7 +1,7 @@
 import React from "react";
 import classes from "./Error.module.css";
 
-export const ValidationError = ({ children, ...props }) => {
+export const Error = ({ children, ...props }) => {
   return (
     <div {...props} className={classes.Error}>
       {children}
@@ -9,4 +9,4 @@ export const ValidationError = ({ children, ...props }) => {
   );
 };
 
-export default ValidationError;
+export default Error;
