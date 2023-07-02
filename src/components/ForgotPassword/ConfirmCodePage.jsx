@@ -5,6 +5,7 @@ import Input from "../../UI/Input/Input";
 import Error from "../../UI/Error/Error";
 import Authorization from "../../APIs/Authorization";
 import { localStorageKeys } from "../../utils/LocalStorageKeys";
+import Errors from "../../utils/Errors";
 
 export const ConfirmCodePage = () => {
   //checkPressedEmailLink();
@@ -30,18 +31,20 @@ export const ConfirmCodePage = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     // TODO change to servlet of send code
-    let userLogin = localStorage.getItem(localStorageKeys.USER_LOGIN);
-    let response = Authorization.sendCodeFToEmail(userLogin, code);
-    goNext(response);
+    //let userLogin = localStorage.getItem(localStorageKeys.USER_LOGIN);
+    //let response = Authorization.sendCodeFToEmail(userLogin, code);
+    //goNext(response);
+    goNext();
   };
   //#endregion
 
   const goNext = (response) => {
-    // change route
-    localStorage.setItem(localStorageKeys.EMAIL_CODE, code);
-    console.log(response);
-    if (response.includes("0")) navigate(`/mainPage`);
-    else setSertverError(Error.authorization(response));
+    // localStorage.setItem(localStorageKeys.EMAIL_CODE, code);
+    // console.log(response);
+    // if (response.includes("0")) navigate(`/repairPassword`);
+    //else setSertverError(Errors.sendCodeToEmail(response));
+
+    navigate(`/restorePassword`);
   };
 
   return (

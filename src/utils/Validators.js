@@ -23,4 +23,9 @@ export default class Validators {
     if (login.length <= 0) return "Login required";
     else return "";
   }
+
+  static validateRepeatPassword(password, rpPassword) {
+    if (rpPassword !== password) return "Passwords mismatch";
+    else return "";
+  }
 }

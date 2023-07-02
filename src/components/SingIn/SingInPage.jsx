@@ -64,7 +64,7 @@ export const SingInPage = () => {
     //console.log(response);
     // fix that
     //if (response.includes("0")) navigate(`/mainPage`);
-    //else setSertverError(Errors.authorization(response));
+    //else setSertverError(Errors.registration(response));
   }
 
   return (
