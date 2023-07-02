@@ -4,23 +4,23 @@ import { BASE_URL } from "./BaseUrl";
 
 export default class Authorization {
   static async logIn(login, password) {
-    const responce = await fetch(`${BASE_URL} + /authorize`, {
+    const response = await fetch(`${BASE_URL} + /authorize`, {
       method: "POST",
       body: {
         login: login,
         password: password,
       },
-    }).then(async (responce) => {
+    }).then(async (response) => {
       return {
-        data: await responce.json(),
+        data: await response.json(),
       };
     });
 
-    return responce;
+    return response;
   }
 
   static async singIn(login, password, email) {
-    const responce = await fetch(`${BASE_URL} + /authorize`, {
+    const response = await fetch(`${BASE_URL} + /authorize`, {
       method: "POST",
       body: {
         login: login,
@@ -32,12 +32,39 @@ export default class Authorization {
         birthday: new Date().toLocaleDateString(locale, yearMonthDay),
         bio: "",
       },
-    }).then(async (responce) => {
+    }).then(async (response) => {
       return {
-        data: await responce.json(),
+        data: await response.json(),
       };
     });
 
-    return responce;
+    return response;
+  }
+
+  static async sendCodeFToEmail(login, code) {
+    const response = await fetch(
+      `${BASE_URL} + /restore?login=${login}&code=${code}`,
+      {
+        method: "GET",
+      }
+    ).then(async (response) => {
+      return {
+        data: await response.json(),
+      };
+    });
+
+    return response;
+  }
+
+  static async checkPressedEmailLink(login) {
+    const response = await fetch(`${BASE_URL} + /confirm?login=${login}}`, {
+      method: "GET",
+    }).then(async (response) => {
+      return {
+        data: await response.json(),
+      };
+    });
+
+    return response;
   }
 }

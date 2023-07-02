@@ -3,12 +3,24 @@ import classes from "../AuthorizationStyles.module.css";
 import { useNavigate } from "react-router-dom";
 import Input from "../../UI/Input/Input";
 import Error from "../../UI/Error/Error";
+import Authorization from "../../APIs/Authorization";
+import { localStorageKeys } from "../../utils/LocalStorageKeys";
 
 export const ConfirmCodePage = () => {
+  //checkPressedEmailLink();
+
   const navigate = useNavigate();
 
   const [code, setCode] = useState("");
   const [serverError, setSertverError] = useState("");
+
+  function checkPressedEmailLink() {
+    let userLogin = localStorage.getItem(localStorageKeys.USER_LOGIN);
+    setInterval(() => {
+      let response = Authorization.checkPressedEmailLink(userLogin);
+      goNext(response);
+    }, 5000);
+  }
 
   //#region handlers
   const handleCodeChange = (event) => {
@@ -18,12 +30,19 @@ export const ConfirmCodePage = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     // TODO change to servlet of send code
-    //let response = Authorization.logIn(login, password, email);
-    //console.log(response);
-    //if (response.includes("0")) navigate(`/mainPage`);
-    //else setSertverError(Errors.authorization(response));
+    let userLogin = localStorage.getItem(localStorageKeys.USER_LOGIN);
+    let response = Authorization.sendCodeFToEmail(userLogin, code);
+    goNext(response);
   };
   //#endregion
+
+  const goNext = (response) => {
+    // change route
+    localStorage.setItem(localStorageKeys.EMAIL_CODE, code);
+    console.log(response);
+    if (response.includes("0")) navigate(`/mainPage`);
+    else setSertverError(Error.authorization(response));
+  };
 
   return (
     <div>
@@ -31,7 +50,7 @@ export const ConfirmCodePage = () => {
       <p className={classes.Title3}>
         Enter code what has been send on your email
       </p>
-      <form>
+      <form onSubmit={handleSubmit}>
         <div className={classes.InputContainer}>
           <Input
             type="text"
